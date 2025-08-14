@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rice and Sugarcane Disease Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/hakdog.png') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        .camera-container {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .controls {
+            position: absolute;
+            bottom: 10%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+        }
+        .controls button {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 24px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+        .controls button:active {
+            transform: scale(0.9);
+        }
+        .close-button {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        #fileInput {
+            display: none;
+        }
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid white;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <button class="close-button" onclick="goHome()"><i class="fas fa-times"></i></button>
+    <div class="camera-container">
+        <video id="video" autoplay playsinline></video>
+    </div>
+    <div class="controls">
+        <button onclick="document.getElementById('fileInput').click()"><i class="fas fa-upload"></i></button>
+        <button id="captureBtn" onclick="takePicture()"><i class="fas fa-camera"></i></button>
+    </div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    <input type="file" id="fileInput" name="file" accept="image/*" onchange="handleFileUpload()">
+    <script>
+        let video = document.getElementById('video');
+        let loadingOverlay = document.getElementById('loadingOverlay');
+
+        async function startCamera() {
+            try {
+                const constraints = {
+                    video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: { ideal: "environment" } }
+                };
+                let currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = currentStream;
+            } catch (error) {
+                alert('Error accessing the camera: ' + error.message);
+            }
+        }
+
+        function goHome() {
+            window.location.href = "/";
+        }
+
+        function takePicture() {
+            document.getElementById('captureBtn').style.transform = "scale(0.9)";
+            setTimeout(() => document.getElementById('captureBtn').style.transform = "scale(1)", 200);
+
+            if (!video.srcObject) {
+                alert("Camera not available");
+                return;
+            }
+            
+            loadingOverlay.style.display = 'flex';
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 224;
+            canvas.height = 224;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg', 1.0);
+            
+            uploadImage(imageData);
+        }
+
+        function handleFileUpload() {
+            loadingOverlay.style.display = 'flex';
+            const file = document.getElementById('fileInput').files[0];
+            const reader = new FileReader();
+            reader.onloadend = function () {
+                uploadImage(reader.result);
+            };
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadImage(imageData) {
+            const formData = new FormData();
+            formData.append('file', dataURLtoBlob(imageData), 'image.png');
+            
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.open();
+                document.write(data);
+                document.close();
+            })
+            .catch(error => console.error('Error:', error))
+            .finally(() => {
+                loadingOverlay.style.display = 'none';
+            });
+        }
+
+        function dataURLtoBlob(dataURL) {
+            const byteString = atob(dataURL.split(',')[1]);
+            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+
+        window.onload = startCamera;
+    </script>
+</body>
+</html>

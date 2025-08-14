@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      DARTS - Dectection Assessment and Recognition in Tarlac City Software
+    </title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='assets/hakdog.png') }}"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: url("{{ url_for('static', filename='assets/hero.png') }}")
+          no-repeat center center fixed;
+        background-size: cover;
+        color: white;
+      }
+      .overlay {
+        background-color: rgba(0, 0, 0, 0.6);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 5vw;
+      }
+      .app-bar {
+        background-color: #1b5e20;
+        padding: 10px 5%;
+        display: flex;
+        align-items: center;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .app-bar img {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-right: 12px;
+      }
+      .title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        letter-spacing: 1.2px;
+      }
+      .welcome-text {
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .sub-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        font-style: italic;
+        color: yellow;
+      }
+      .description {
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        max-width: 600px;
+        margin: 16px 0;
+      }
+      /* Updated start-button with animations */
+      .start-button {
+        position: relative;
+        overflow: hidden;
+        background-color: #388e3c;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+      }
+      .start-button:hover {
+        background-color: #2e7d32;
+        transform: translateY(-3px);
+      }
+      .start-button:active {
+        transform: translateY(0);
+      }
+      /* Ripple effect */
+      .start-button::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.3);
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.1);
+        transition: opacity 0.5s, transform 0.5s;
+        border-radius: inherit;
+      }
+      .start-button:active::after {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        transition: transform 0s;
+      }
+      .container {
+        padding: 5vw;
+        max-width: 1100px;
+        margin: auto;
+        background-color: white;
+        color: black;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+      }
+      .left-section,
+      .right-section {
+        flex: 1;
+        min-width: 300px;
+        padding: 10px;
+      }
+      .button {
+        background-color: #4caf50;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: inline-block;
+        margin-top: 10px;
+      }
+      .button:hover {
+        background-color: #45a049;
+      }
+      .image-container {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: auto;
+      }
+      .image-container img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+      .info-box {
+        background-color: white;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 16px;
+        text-align: center;
+      }
+      .info-box img {
+        width: 100%;
+        border-radius: 10px;
+      }
+      .info-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .info-text {
+        font-size: 1rem;
+        color: #555;
+      }
+      @media screen and (max-width: 768px) {
+        .welcome-text {
+          font-size: 1.8rem;
+        }
+        .sub-title {
+          font-size: 2rem;
+        }
+        .description {
+          font-size: 0.9rem;
+        }
+        .start-button,
+        .button {
+          font-size: 0.9rem;
+          padding: 10px 18px;
+        }
+        .app-bar {
+          padding: 10px 5%;
+        }
+        .title {
+          font-size: 1.2rem;
+        }
+        .container {
+          padding: 5%;
+        }
+        .image-container {
+          height: auto;
+        }
+        .section {
+          flex-direction: column;
+          text-align: center;
+        }
+        .left-section,
+        .right-section {
+          min-width: 100%;
+          text-align: center;
+        }
+      }
+      .indicator-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
+.indicator-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+
+.green {
+  background-color: green;
+}
+
+.orange {
+  background-color: orange;
+}
+
+.red {
+  background-color: red;
+}
+
+/* Tooltip Styling */
+.indicator-icon:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.indicator-guide {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.indicator-guide h3 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.indicator-guide p {
+  font-size: 16px;
+  color: #555;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="app-bar">
+      <img
+        src="{{ url_for('static', filename='assets/farmer.png') }}"
+        alt="Farmer"
+      />
+      <div class="title">DARTS</div>
+    </div>
+
+    <div class="overlay">
+      <div class="welcome-text">Welcome to DARTS</div>
+      <div class="sub-title">Disease Assessment and Recognition in Tarlac city, Software</div>
+      <div class="description">
+        Pagtulong sa mga magsasaka sa matalino at napapanatiling solusyon gamit ang makabagong solusyon para sa agrikultura.
+      </div>
+      <button class="start-button" onclick="scrollToDiagnosis()">
+        Simulan ang iyong Paglalakbay 
+      </button>
+    </div>
+
+    <div class="container" id="diagnosis-section">
+      <div class="section">
+        <div class="left-section">
+          <h2>Diagnose Your Crop</h2>
+          <p>
+            kumuha nang picture sainyong pananim at iupload ito at makukuha mo ang impormasyon at diskarte sa pamamahala 
+            nang iyong pananim lahat sa loob lamang ng ilang segundo!
+          </p>
+          <button class="button" onclick="navigateToCamera()">
+            Diagnose Now!
+          </button>
+        </div>
+        <div class="right-section">
+          <div class="image-container">
+            <img
+              src="{{ url_for('static', filename='assets/una.png') }}"
+              alt="Crop Diagnosis"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="left-section">
+          <div class="info-box">
+            <img
+              src="{{ url_for('static', filename='assets/pangalawa.png') }}"
+              alt="Information"
+            />
+          </div>
+        </div>
+        <div class="right-section">
+          <div class="info-title">
+            Looking for information about crop diseases?
+          </div>
+          <p class="info-text">
+            Ang aming web-based application! Ang kaylangan mo 
+            Sa impormasyon tungkol sa mga partikular na sakit 
+            sa pananim at mga paraan ng pag-iwas, masisiguro mong matagumpay ang pag-aani.
+          </p>
+          <button class="button" onclick="navigateToCamera()">
+            Use Detection Now!
+          </button>
+        </div>
+      </div>
+      <div class="indicator-guide">
+        <h3>Indicator Guide</h3>
+        <p>These indicators represent the condition of the detected crop:</p>
+      </div>
+      <!-- Indicator Icons Section -->
+<div class="indicator-container">
+    <!-- Green Indicator -->
+    <div class="indicator-wrapper">
+      <div class="tooltip">Healthy: walang sign nag disease ang iyong pananim.</div>
+      <div class="indicator-icon green"></div>
+    </div>
+  
+    <!-- Orange Indicator -->
+    <div class="indicator-wrapper">
+      <div class="tooltip">Mild: Meron nakita ang system, Inirerekomenda ang pagsubaybay at maagang paggamot. .</div>
+      <div class="indicator-icon orange"></div>
+    </div>
+  
+    <!-- Red Indicator -->
+    <div class="indicator-wrapper">
+      <div class="tooltip">Severe:  kritikal na ang pananim mo! Kinakailangan ang agarang interbensyon.</div>
+      <div class="indicator-icon red"></div>
+    </div>
+  </div>
+  
+
+    </div>
+
+    
+    <script>
+      function scrollToDiagnosis() {
+        document
+          .getElementById("diagnosis-section")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+      function navigateToCamera() {
+        window.location.href = "/camera"; // Ensure this page exists
+      }
+    </script>
+  </body>
+</html>
