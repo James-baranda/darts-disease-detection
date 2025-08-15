@@ -393,7 +393,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        st.image(uploaded_file, caption="Plant Leaf Image", use_column_width=True)
+        st.image(uploaded_file, caption="Plant Leaf Image", use_container_width=True)
         
         # Enhanced image info
         image = Image.open(uploaded_file)
