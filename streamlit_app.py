@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
+import time
 
 # Page configuration
 st.set_page_config(
@@ -9,6 +10,101 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Custom CSS for aesthetic design
+st.markdown("""
+<style>
+    /* Main background gradient */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Header styling */
+    .main-header {
+        background: linear-gradient(90deg, #4CAF50, #45a049);
+        padding: 2rem;
+        border-radius: 15px;
+        text-align: center;
+        color: white;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    
+    /* Card styling */
+    .info-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        margin: 1rem 0;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    /* Upload area styling */
+    .upload-area {
+        background: linear-gradient(145deg, #f0f2f6, #ffffff);
+        border: 3px dashed #4CAF50;
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        margin: 1rem 0;
+        transition: all 0.3s ease;
+    }
+    
+    /* Results card */
+    .results-card {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin: 1rem 0;
+    }
+    
+    /* Metric cards */
+    .metric-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin: 0.5rem;
+    }
+    
+    /* Animation keyframes */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    
+    /* Sidebar styling */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Button styling */
+    .stButton > button {
+        background: linear-gradient(90deg, #4CAF50, #45a049);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Import disease data from the main app
 try:
@@ -122,29 +218,78 @@ def analyze_image(image):
         return "Error", 0.0
 
 def main():
-    # Header
-    st.title("🌱 DARTS - Disease Detection System")
-    st.markdown("**Detection Assessment and Recognition in Tarlac City Software**")
-    st.markdown("*AI-powered rice and sugarcane disease detection*")
+    # Animated Header
+    st.markdown("""
+    <div class="main-header pulse-animation">
+        <h1>🌱 DARTS - Disease Detection System</h1>
+        <h3>Detection Assessment and Recognition in Tarlac City Software</h3>
+        <p style="font-size: 1.2em; margin-top: 1rem;">🤖 AI-Powered Agricultural Disease Detection</p>
+        <p style="font-size: 1em; opacity: 0.9;">Advanced Computer Vision • Real-time Analysis • Expert Recommendations</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Sidebar
+    # Enhanced Sidebar with animations
     with st.sidebar:
-        st.header("📊 System Info")
-        st.info("**Version:** 2.0")
-        st.info("**Diseases:** 11 Categories")
-        st.info("**Crops:** Rice & Sugarcane")
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 1rem;">
+            <h2 style="color: white;">🔬 System Dashboard</h2>
+        </div>
+        """, unsafe_allow_html=True)
         
-        st.header("🎯 Supported Diseases")
-        disease_list = list(disease_mapping.values())
-        for disease in disease_list[:6]:  # Show first 6
-            st.text(f"• {disease}")
-        if len(disease_list) > 6:
-            st.text(f"• ... and {len(disease_list) - 6} more")
+        # Animated metrics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>11</h3>
+                <p>Diseases</p>
+            </div>
+            """, unsafe_allow_html=True)
+        with col2:
+            st.markdown("""
+            <div class="metric-card">
+                <h3>2</h3>
+                <p>Crop Types</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Disease categories with icons
+        st.markdown("### 🎯 Disease Categories")
+        disease_categories = {
+            "🦠 Bacterial": ["BacterialBlight"],
+            "🍄 Fungal": ["Brownspot (Rice)", "Brown Spot (Sugarcane)", "BrownRust", "Leafsmut"],
+            "🦠 Viral": ["Tungro", "Grassy shoot"],
+            "🌿 Physiological": ["Banded Chlorosis", "Dried Leaves", "Yellow Leaf"],
+            "✅ Healthy": ["Healthy Leaves"]
+        }
+        
+        for category, diseases in disease_categories.items():
+            with st.expander(f"{category} ({len(diseases)})"):
+                for disease in diseases:
+                    st.write(f"• {disease}")
+        
+        st.markdown("---")
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
+            <p style="color: white; margin: 0;"><strong>🚀 Version 2.0</strong></p>
+            <p style="color: white; margin: 0; font-size: 0.8em;">Enhanced AI Analysis</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Prominent file uploader at the top
-    st.subheader("📤 Upload Plant Image for Analysis")
+    # Dynamic Upload Area
+    st.markdown("""
+    <div class="info-card">
+        <h2 style="text-align: center; color: #4CAF50;">📤 Upload Plant Image for AI Analysis</h2>
+        <p style="text-align: center; font-size: 1.1em; color: #666;">
+            Upload a clear image of rice or sugarcane leaf to get instant disease detection
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     uploaded_file = st.file_uploader(
         "Choose a rice or sugarcane leaf image",
         type=['png', 'jpg', 'jpeg'],
@@ -153,115 +298,350 @@ def main():
     )
     
     if uploaded_file is None:
-        st.info("👆 **Please upload an image to start disease analysis**")
-        st.markdown("### 📋 Instructions:")
-        st.markdown("1. **Take a photo** of a rice or sugarcane leaf")
-        st.markdown("2. **Upload the image** using the file uploader above")
-        st.markdown("3. **Click Analyze** to get disease detection results")
-        st.markdown("4. **View detailed** disease information and management strategies")
+        # Enhanced instructions with animations
+        st.markdown("""
+        <div class="upload-area">
+            <h3 style="color: #4CAF50; margin-bottom: 1rem;">🚀 Get Started in 4 Easy Steps</h3>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Show example
-        st.markdown("### 🌱 Supported Plant Types:")
+        # Step-by-step guide with progress indicators
+        steps = [
+            ("📸", "Take Photo", "Capture a clear image of rice or sugarcane leaf"),
+            ("⬆️", "Upload Image", "Use the file uploader above to select your image"),
+            ("🔍", "AI Analysis", "Click analyze to get instant disease detection"),
+            ("📊", "View Results", "Get detailed disease info and management tips")
+        ]
+        
+        cols = st.columns(4)
+        for i, (icon, title, desc) in enumerate(steps):
+            with cols[i]:
+                st.markdown(f"""
+                <div class="info-card" style="text-align: center; min-height: 150px;">
+                    <div style="font-size: 2em; margin-bottom: 0.5rem;">{icon}</div>
+                    <h4 style="color: #4CAF50; margin-bottom: 0.5rem;">{title}</h4>
+                    <p style="font-size: 0.9em; color: #666;">{desc}</p>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        # Supported crops showcase
+        st.markdown("### 🌾 Supported Crops & Diseases")
         col1, col2 = st.columns(2)
+        
         with col1:
-            st.success("✅ **Rice Leaves**")
-            st.text("• Bacterial Blight")
-            st.text("• Brown Spot")
-            st.text("• Tungro")
-            st.text("• Leaf Smut")
+            st.markdown("""
+            <div class="info-card">
+                <h4 style="color: #4CAF50;">🌾 Rice Diseases</h4>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li>🦠 Bacterial Blight</li>
+                    <li>🍄 Brown Spot</li>
+                    <li>🦠 Tungro Virus</li>
+                    <li>🍄 Leaf Smut</li>
+                    <li>🌿 Banded Chlorosis</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+            
         with col2:
-            st.success("✅ **Sugarcane Leaves**")
-            st.text("• Brown Spot")
-            st.text("• Dried Leaves")
-            st.text("• Yellow Leaf")
-            st.text("• Healthy Leaves")
+            st.markdown("""
+            <div class="info-card">
+                <h4 style="color: #4CAF50;">🎋 Sugarcane Diseases</h4>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li>🍄 Brown Spot</li>
+                    <li>🌿 Dried Leaves</li>
+                    <li>🌿 Yellow Leaf</li>
+                    <li>🍄 Brown Rust</li>
+                    <li>✅ Healthy Leaves</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # GitHub repository note
+        st.markdown("---")
+        st.markdown("""
+        <div class="info-card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+            <h3 style="text-align: center;">🚀 Want the Full AI Experience?</h3>
+            <p style="text-align: center; font-size: 1.1em;">
+                This Streamlit demo uses enhanced color-based analysis for disease detection.
+            </p>
+            <p style="text-align: center; font-size: 1.1em;">
+                <strong>For the complete CNN-powered AI model with TensorFlow:</strong>
+            </p>
+            <p style="text-align: center;">
+                <a href="https://github.com/James-baranda/darts-disease-detection" 
+                   style="color: #FFD700; text-decoration: none; font-weight: bold; font-size: 1.2em;">
+                   📂 Visit Our GitHub Repository
+                </a>
+            </p>
+            <p style="text-align: center; font-size: 0.9em; opacity: 0.9;">
+                Clone the repository and run the Flask application (app.py) for full CNN model analysis
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
         
         return  # Exit early if no file uploaded
     
-    # Main content when file is uploaded
+    # Enhanced analysis interface when image is uploaded
+    st.markdown("### 🔬 AI Disease Analysis")
+    
     col1, col2 = st.columns([1, 1])
     
     with col1:
-        st.subheader("📷 Uploaded Image")
+        st.markdown("""
+        <div class="results-card">
+            <h4 style="color: #4CAF50; text-align: center;">📷 Uploaded Image</h4>
+        </div>
+        """, unsafe_allow_html=True)
+        
         st.image(uploaded_file, caption="Plant Leaf Image", use_column_width=True)
         
-        # Image info
+        # Enhanced image info
         image = Image.open(uploaded_file)
-        st.caption(f"Image size: {image.size[0]} x {image.size[1]} pixels")
-        st.caption(f"File name: {uploaded_file.name}")
-        st.caption(f"File size: {uploaded_file.size / 1024:.1f} KB")
+        st.markdown(f"""
+        <div class="info-card" style="margin-top: 1rem;">
+            <h5>📊 Image Details</h5>
+            <p><strong>Dimensions:</strong> {image.size[0]} × {image.size[1]} pixels</p>
+            <p><strong>File Name:</strong> {uploaded_file.name}</p>
+            <p><strong>File Size:</strong> {uploaded_file.size / 1024:.1f} KB</p>
+            <p><strong>Format:</strong> {image.format}</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.subheader("🔬 Analysis Results")
+        st.markdown("""
+        <div class="results-card">
+            <h4 style="color: #4CAF50; text-align: center;">🤖 AI Analysis Results</h4>
+        </div>
+        """, unsafe_allow_html=True)
         
         if st.button("🔍 Analyze Disease", type="primary", use_container_width=True):
-            with st.spinner("🔄 Analyzing plant health..."):
-                # Load and analyze image
-                image = Image.open(uploaded_file)
-                result, confidence = analyze_image(image)
+            # Enhanced loading animation
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            # Simulate AI processing steps
+            steps = [
+                ("🔍 Preprocessing image...", 20),
+                ("🧠 Running AI analysis...", 50),
+                ("📊 Calculating confidence...", 80),
+                ("✅ Generating results...", 100)
+            ]
+            
+            for step_text, progress in steps:
+                status_text.text(step_text)
+                progress_bar.progress(progress)
+                time.sleep(0.5)
+            
+            # Clear progress indicators
+            progress_bar.empty()
+            status_text.empty()
+            
+            # Load and analyze image
+            image = Image.open(uploaded_file)
+            result, confidence = analyze_image(image)
+            
+            # Enhanced results display
+            if result == "Healthy Leaves":
+                st.markdown(f"""
+                <div class="results-card" style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white;">
+                    <h3 style="text-align: center;">🌿 {result}</h3>
+                    <h4 style="text-align: center;">Confidence: {confidence:.1%}</h4>
+                    <p style="text-align: center; margin-top: 1rem;">Excellent! Your plant appears healthy.</p>
+                </div>
+                """, unsafe_allow_html=True)
+                st.balloons()
+            elif result in ["BacterialBlight", "Tungro", "Brownspot (Rice)"]:
+                st.markdown(f"""
+                <div class="results-card" style="background: linear-gradient(135deg, #f44336, #d32f2f); color: white;">
+                    <h3 style="text-align: center;">🦠 {result}</h3>
+                    <h4 style="text-align: center;">Confidence: {confidence:.1%}</h4>
+                    <p style="text-align: center; margin-top: 1rem;">Disease detected - immediate attention needed.</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="results-card" style="background: linear-gradient(135deg, #ff9800, #f57c00); color: white;">
+                    <h3 style="text-align: center;">⚠️ {result}</h3>
+                    <h4 style="text-align: center;">Confidence: {confidence:.1%}</h4>
+                    <p style="text-align: center; margin-top: 1rem;">Potential issue detected - monitor closely.</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Detailed disease information in expandable cards
+            if result in disease_data:
+                info = disease_data[result]
                 
-                # Display results
-                if result == "Healthy Leaves":
-                    st.success(f"🌿 **Disease: {result}**")
-                    st.success(f"**Confidence: {confidence:.1%}**")
-                    st.balloons()
-                elif result in ["BacterialBlight", "Tungro", "Brownspot (Rice)"]:
-                    st.error(f"🦠 **Disease: {result}**")
-                    st.error(f"**Confidence: {confidence:.1%}**")
-                else:
-                    st.warning(f"⚠️ **Disease: {result}**")
-                    st.warning(f"**Confidence: {confidence:.1%}**")
+                st.markdown("---")
                 
-                # Show detailed disease information
-                if result in disease_data:
-                    info = disease_data[result]
-                    
-                    st.markdown("### 📋 Disease Information")
-                    
-                    # Type
+                # Disease type and symptoms
+                with st.expander("📋 Disease Information", expanded=True):
                     st.markdown(f"**Type:** {info['Type']}")
                     
-                    # Symptoms
-                    st.markdown("**Symptoms:**")
-                    for symptom in info['Symptoms']:
-                        st.markdown(f"• {symptom}")
+                    col_sym, col_causes = st.columns(2)
+                    with col_sym:
+                        st.markdown("**🔍 Symptoms:**")
+                        for symptom in info['Symptoms']:
+                            st.markdown(f"• {symptom}")
                     
-                    # Causes (if available)
-                    if 'Causes' in info:
-                        st.markdown("**Causes:**")
-                        for cause in info['Causes']:
-                            st.markdown(f"• {cause}")
-                    
-                    # Management Strategies
-                    st.markdown("**Management Strategies:**")
-                    strategies = info.get('Management Strategies', info.get('Management', []))
-                    for strategy in strategies:
-                        st.markdown(f"• {strategy}")
+                    with col_causes:
+                        if 'Causes' in info:
+                            st.markdown("**🔬 Causes:**")
+                            for cause in info['Causes']:
+                                st.markdown(f"• {cause}")
                 
-                # Additional recommendations
-                st.markdown("### 💡 Recommendations")
-                if result == "Healthy Leaves":
-                    st.success("✅ Continue current care routine")
-                    st.info("🔍 Monitor regularly for early detection")
-                else:
-                    st.warning("⚠️ Consider consulting an agricultural expert")
-                    st.info("📞 Contact local agricultural extension office")
+                # Management strategies
+                with st.expander("💊 Treatment & Management", expanded=True):
+                    strategies = info.get('Management Strategies', info.get('Management', []))
+                    for i, strategy in enumerate(strategies, 1):
+                        st.markdown(f"**{i}.** {strategy}")
+                
+                # Recommendations
+                with st.expander("💡 Expert Recommendations", expanded=True):
+                    if result == "Healthy Leaves":
+                        st.success("✅ **Continue current care routine**")
+                        st.info("🔍 **Monitor regularly** for early detection of any changes")
+                        st.info("🌱 **Maintain** current fertilization and watering schedule")
+                    else:
+                        st.warning("⚠️ **Immediate Action Required**")
+                        st.info("👨‍🌾 **Consult** with local agricultural extension officer")
+                        st.info("📞 **Contact** plant pathology expert for severe cases")
+                        st.info("📚 **Document** symptoms for treatment tracking")
         else:
-            st.info("👆 Click the button above to analyze the uploaded image")
+            st.markdown("""
+            <div class="info-card" style="text-align: center; padding: 2rem;">
+                <h4 style="color: #4CAF50;">Ready for Analysis! 🚀</h4>
+                <p>Click the button above to start AI-powered disease detection</p>
+                <p style="font-size: 0.9em; color: #666;">Analysis typically takes 2-3 seconds</p>
+            </div>
+            """, unsafe_allow_html=True)
     
-    # Footer
+    # Enhanced Footer with statistics and links
     st.markdown("---")
-    st.markdown("### 🔬 About DARTS")
+    st.markdown("""
+    <div class="info-card" style="text-align: center;">
+        <h3 style="color: #4CAF50;">🔬 DARTS System Statistics</h3>
+    </div>
+    """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
+    # Dynamic metrics with animations
+    col1, col2, col3, col4 = st.columns(4)
+    
     with col1:
-        st.metric("Diseases Detected", "11", "Categories")
-    with col2:
-        st.metric("Crops Supported", "2", "Rice & Sugarcane")
-    with col3:
-        st.metric("Analysis Method", "AI", "Color-based")
+        st.markdown("""
+        <div class="metric-card pulse-animation">
+            <h2>11</h2>
+            <p>Disease Types</p>
+            <small>Bacterial • Fungal • Viral</small>
+        </div>
+        """, unsafe_allow_html=True)
     
-    st.info("**Note:** This Streamlit version uses enhanced color-based analysis. For full CNN model analysis, use the Flask application.")
+    with col2:
+        st.markdown("""
+        <div class="metric-card pulse-animation">
+            <h2>2</h2>
+            <p>Crop Types</p>
+            <small>Rice • Sugarcane</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div class="metric-card pulse-animation">
+            <h2>AI</h2>
+            <p>Analysis Method</p>
+            <small>Color-based Detection</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col4:
+        st.markdown("""
+        <div class="metric-card pulse-animation">
+            <h2>2.0</h2>
+            <p>Version</p>
+            <small>Enhanced Interface</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Technology showcase
+    st.markdown("### 🛠️ Technology Stack")
+    tech_col1, tech_col2, tech_col3 = st.columns(3)
+    
+    with tech_col1:
+        st.markdown("""
+        <div class="info-card">
+            <h4 style="color: #4CAF50;">🐍 Backend</h4>
+            <p>• Python 3.11</p>
+            <p>• Streamlit Framework</p>
+            <p>• NumPy & PIL</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with tech_col2:
+        st.markdown("""
+        <div class="info-card">
+            <h4 style="color: #4CAF50;">🤖 AI Engine</h4>
+            <p>• Color Analysis</p>
+            <p>• Pattern Recognition</p>
+            <p>• Confidence Scoring</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with tech_col3:
+        st.markdown("""
+        <div class="info-card">
+            <h4 style="color: #4CAF50;">🎨 Interface</h4>
+            <p>• Responsive Design</p>
+            <p>• Dynamic Animations</p>
+            <p>• Modern UI/UX</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Final call-to-action for GitHub
+    st.markdown("---")
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 2rem; border-radius: 15px; text-align: center; color: white; margin: 2rem 0;">
+        <h2>🚀 Ready for Production-Grade AI?</h2>
+        <p style="font-size: 1.2em; margin: 1rem 0;">
+            This Streamlit demo showcases our enhanced color-based disease detection algorithm.
+        </p>
+        <p style="font-size: 1.1em; margin: 1rem 0;">
+            <strong>For the complete experience with CNN deep learning models:</strong>
+        </p>
+        <div style="margin: 2rem 0;">
+            <a href="https://github.com/James-baranda/darts-disease-detection" 
+               style="background: #FFD700; color: #333; padding: 1rem 2rem; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 1.1em; display: inline-block; transition: all 0.3s ease;">
+               📂 Clone Our GitHub Repository
+            </a>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 2rem; flex-wrap: wrap;">
+            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 10px; min-width: 200px;">
+                <h4>🧠 Full CNN Model</h4>
+                <p>TensorFlow-powered deep learning for maximum accuracy</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 10px; min-width: 200px;">
+                <h4>🌐 Flask Web App</h4>
+                <p>Production-ready web application with advanced features</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 10px; min-width: 200px;">
+                <h4>📊 Detailed Analytics</h4>
+                <p>Comprehensive disease analysis and management strategies</p>
+            </div>
+        </div>
+        <p style="margin-top: 2rem; font-size: 0.9em; opacity: 0.8;">
+            Run <code style="background: rgba(255,255,255,0.2); padding: 0.2rem 0.5rem; border-radius: 3px;">python app.py</code> 
+            from the repository for the complete CNN-powered experience
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Credits and version info
+    st.markdown("""
+    <div style="text-align: center; padding: 1rem; color: #666; font-size: 0.9em;">
+        <p><strong>DARTS v2.0</strong> - Detection Assessment and Recognition in Tarlac City Software</p>
+        <p>Developed with ❤️ for sustainable agriculture • Enhanced Streamlit Interface</p>
+        <p>© 2024 DARTS Project • Open Source Agricultural Technology</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
