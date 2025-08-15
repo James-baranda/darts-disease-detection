@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-import cv2
 
 # Page configuration
 st.set_page_config(
@@ -65,43 +64,57 @@ disease_mapping = {
 }
 
 def analyze_image(image):
-    """Enhanced disease detection analysis"""
+    """Enhanced disease detection analysis using PIL and NumPy"""
     try:
         img_array = np.array(image)
         if len(img_array.shape) == 3:
-            # Convert to HSV for better color analysis
-            img_hsv = cv2.cvtColor(img_array, cv2.COLOR_RGB2HSV)
-            
             # Calculate color statistics
             red = np.mean(img_array[:, :, 0])
             green = np.mean(img_array[:, :, 1])
             blue = np.mean(img_array[:, :, 2])
             
-            # Calculate green percentage for plant detection
-            lower_green = np.array([25, 30, 10])
-            upper_green = np.array([100, 255, 255])
-            mask = cv2.inRange(img_hsv, lower_green, upper_green)
-            green_percentage = (cv2.countNonZero(mask) / mask.size) * 100
+            # Calculate color ratios and statistics
+            total_brightness = red + green + blue
+            green_ratio = green / total_brightness if total_brightness > 0 else 0
+            red_ratio = red / total_brightness if total_brightness > 0 else 0
             
-            # Enhanced disease classification
-            if green_percentage < 10:
+            # Calculate green dominance for plant detection
+            green_dominance = green - max(red, blue)
+            
+            # Calculate color variance for texture analysis
+            red_var = np.var(img_array[:, :, 0])
+            green_var = np.var(img_array[:, :, 1])
+            blue_var = np.var(img_array[:, :, 2])
+            color_variance = (red_var + green_var + blue_var) / 3
+            
+            # Enhanced disease classification logic
+            if green < 60 and red > 80 and blue < 70:
+                # Brown/dried appearance
                 return "Dried Leaves", 0.82
-            elif green > red and green > blue and green > 120:
-                if red < 80 and blue < 80:
-                    return "Healthy Leaves", 0.88
-                else:
-                    return "Banded Chlorosis", 0.75
-            elif red > green and red > 100:
-                if green < 60:
+            elif green > 120 and green_dominance > 30 and color_variance < 1000:
+                # Healthy green with low variance
+                return "Healthy Leaves", 0.88
+            elif green > 100 and red > 90 and green_ratio > 0.4:
+                # Yellowish-green, possible chlorosis
+                return "Banded Chlorosis", 0.75
+            elif red > green and red > 100 and green < 80:
+                # Reddish-brown spots
+                if color_variance > 1500:
                     return "BacterialBlight", 0.79
                 else:
                     return "Brownspot (Rice)", 0.73
-            elif green < 70 and red > 80:
+            elif green < 90 and red > 70 and blue < 60:
+                # Yellow-orange discoloration
                 return "Tungro", 0.76
-            elif green_percentage > 15:
+            elif green > 80 and green_dominance > 10:
+                # Moderately healthy
                 return "Healthy Leaves", 0.70
-            else:
+            elif red > 60 and green < 80:
+                # Some disease symptoms
                 return "Dried Leaves", 0.68
+            else:
+                # Default classification
+                return "Healthy Leaves", 0.65
         else:
             return "Unknown", 0.50
     except Exception as e:
