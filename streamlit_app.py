@@ -143,82 +143,111 @@ def main():
     
     st.markdown("---")
     
-    # Main content
+    # Prominent file uploader at the top
+    st.subheader("📤 Upload Plant Image for Analysis")
+    uploaded_file = st.file_uploader(
+        "Choose a rice or sugarcane leaf image",
+        type=['png', 'jpg', 'jpeg'],
+        help="Upload a clear image of a plant leaf for disease analysis",
+        key="main_uploader"
+    )
+    
+    if uploaded_file is None:
+        st.info("👆 **Please upload an image to start disease analysis**")
+        st.markdown("### 📋 Instructions:")
+        st.markdown("1. **Take a photo** of a rice or sugarcane leaf")
+        st.markdown("2. **Upload the image** using the file uploader above")
+        st.markdown("3. **Click Analyze** to get disease detection results")
+        st.markdown("4. **View detailed** disease information and management strategies")
+        
+        # Show example
+        st.markdown("### 🌱 Supported Plant Types:")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.success("✅ **Rice Leaves**")
+            st.text("• Bacterial Blight")
+            st.text("• Brown Spot")
+            st.text("• Tungro")
+            st.text("• Leaf Smut")
+        with col2:
+            st.success("✅ **Sugarcane Leaves**")
+            st.text("• Brown Spot")
+            st.text("• Dried Leaves")
+            st.text("• Yellow Leaf")
+            st.text("• Healthy Leaves")
+        
+        return  # Exit early if no file uploaded
+    
+    # Main content when file is uploaded
     col1, col2 = st.columns([1, 1])
     
     with col1:
-        st.subheader("📤 Upload Plant Image")
-        uploaded_file = st.file_uploader(
-            "Choose a rice or sugarcane leaf image",
-            type=['png', 'jpg', 'jpeg'],
-            help="Upload a clear image of a plant leaf for disease analysis"
-        )
+        st.subheader("📷 Uploaded Image")
+        st.image(uploaded_file, caption="Plant Leaf Image", use_column_width=True)
         
-        if uploaded_file is not None:
-            st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
-            
-            # Image info
-            image = Image.open(uploaded_file)
-            st.caption(f"Image size: {image.size[0]} x {image.size[1]} pixels")
+        # Image info
+        image = Image.open(uploaded_file)
+        st.caption(f"Image size: {image.size[0]} x {image.size[1]} pixels")
+        st.caption(f"File name: {uploaded_file.name}")
+        st.caption(f"File size: {uploaded_file.size / 1024:.1f} KB")
     
     with col2:
         st.subheader("🔬 Analysis Results")
         
-        if uploaded_file is not None:
-            if st.button("🔍 Analyze Disease", type="primary", use_container_width=True):
-                with st.spinner("🔄 Analyzing plant health..."):
-                    # Load and analyze image
-                    image = Image.open(uploaded_file)
-                    result, confidence = analyze_image(image)
+        if st.button("🔍 Analyze Disease", type="primary", use_container_width=True):
+            with st.spinner("🔄 Analyzing plant health..."):
+                # Load and analyze image
+                image = Image.open(uploaded_file)
+                result, confidence = analyze_image(image)
+                
+                # Display results
+                if result == "Healthy Leaves":
+                    st.success(f"🌿 **Disease: {result}**")
+                    st.success(f"**Confidence: {confidence:.1%}**")
+                    st.balloons()
+                elif result in ["BacterialBlight", "Tungro", "Brownspot (Rice)"]:
+                    st.error(f"🦠 **Disease: {result}**")
+                    st.error(f"**Confidence: {confidence:.1%}**")
+                else:
+                    st.warning(f"⚠️ **Disease: {result}**")
+                    st.warning(f"**Confidence: {confidence:.1%}**")
+                
+                # Show detailed disease information
+                if result in disease_data:
+                    info = disease_data[result]
                     
-                    # Display results
-                    if result == "Healthy Leaves":
-                        st.success(f"🌿 **Disease: {result}**")
-                        st.success(f"**Confidence: {confidence:.1%}**")
-                        st.balloons()
-                    elif result in ["BacterialBlight", "Tungro", "Brownspot (Rice)"]:
-                        st.error(f"🦠 **Disease: {result}**")
-                        st.error(f"**Confidence: {confidence:.1%}**")
-                    else:
-                        st.warning(f"⚠️ **Disease: {result}**")
-                        st.warning(f"**Confidence: {confidence:.1%}**")
+                    st.markdown("### 📋 Disease Information")
                     
-                    # Show detailed disease information
-                    if result in disease_data:
-                        info = disease_data[result]
-                        
-                        st.markdown("### 📋 Disease Information")
-                        
-                        # Type
-                        st.markdown(f"**Type:** {info['Type']}")
-                        
-                        # Symptoms
-                        st.markdown("**Symptoms:**")
-                        for symptom in info['Symptoms']:
-                            st.markdown(f"• {symptom}")
-                        
-                        # Causes (if available)
-                        if 'Causes' in info:
-                            st.markdown("**Causes:**")
-                            for cause in info['Causes']:
-                                st.markdown(f"• {cause}")
-                        
-                        # Management Strategies
-                        st.markdown("**Management Strategies:**")
-                        strategies = info.get('Management Strategies', info.get('Management', []))
-                        for strategy in strategies:
-                            st.markdown(f"• {strategy}")
+                    # Type
+                    st.markdown(f"**Type:** {info['Type']}")
                     
-                    # Additional recommendations
-                    st.markdown("### 💡 Recommendations")
-                    if result == "Healthy Leaves":
-                        st.success("✅ Continue current care routine")
-                        st.info("🔍 Monitor regularly for early detection")
-                    else:
-                        st.warning("⚠️ Consider consulting an agricultural expert")
-                        st.info("📞 Contact local agricultural extension office")
+                    # Symptoms
+                    st.markdown("**Symptoms:**")
+                    for symptom in info['Symptoms']:
+                        st.markdown(f"• {symptom}")
+                    
+                    # Causes (if available)
+                    if 'Causes' in info:
+                        st.markdown("**Causes:**")
+                        for cause in info['Causes']:
+                            st.markdown(f"• {cause}")
+                    
+                    # Management Strategies
+                    st.markdown("**Management Strategies:**")
+                    strategies = info.get('Management Strategies', info.get('Management', []))
+                    for strategy in strategies:
+                        st.markdown(f"• {strategy}")
+                
+                # Additional recommendations
+                st.markdown("### 💡 Recommendations")
+                if result == "Healthy Leaves":
+                    st.success("✅ Continue current care routine")
+                    st.info("🔍 Monitor regularly for early detection")
+                else:
+                    st.warning("⚠️ Consider consulting an agricultural expert")
+                    st.info("📞 Contact local agricultural extension office")
         else:
-            st.info("👆 Upload an image to start analysis")
+            st.info("👆 Click the button above to analyze the uploaded image")
     
     # Footer
     st.markdown("---")
