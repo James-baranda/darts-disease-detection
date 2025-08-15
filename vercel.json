@@ -14,10 +14,5 @@
   ],
   "env": {
     "PYTHONPATH": "/var/task"
-  },
-  "functions": {
-    "app_vercel.py": {
-      "maxDuration": 30
-    }
   }
 }
